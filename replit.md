@@ -17,20 +17,24 @@ server/
   db.ts                       - PostgreSQL connection pool (Drizzle)
   routes.ts                   - API route handlers (GET/POST/PATCH/DELETE)
   storage.ts                  - Storage interface + DatabaseStorage class
-  prospect-helpers.ts         - Pure helper functions (getNextStatus, validateProspect, isTerminalStatus)
+  prospect-helpers.ts         - Pure helper functions (getNextStatus, validateProspect, isTerminalStatus, getRelativeAge, parseSalaryToNumber)
+  __tests__/                  - Jest tests for validation, date age, salary parsing
 client/src/
   App.tsx                     - Root component, routing, providers
-  pages/home.tsx              - Kanban board with 7 status columns
+  pages/home.tsx              - Kanban board with "All Jobs" + 7 status columns
+  lib/
+    currency.ts               - Currency formatting utilities
+    date.ts                   - Date age formatting + date input helpers
   components/
-    prospect-card.tsx         - Card component with edit/delete actions
-    add-prospect-form.tsx     - Dialog form for creating prospects
-    edit-prospect-form.tsx    - Dialog form for editing prospects
+    prospect-card.tsx         - Card component with edit/delete actions, age display
+    add-prospect-form.tsx     - Dialog form for creating prospects (with dateApplied)
+    edit-prospect-form.tsx    - Dialog form for editing prospects (with dateApplied)
     ui/                       - shadcn/ui primitives
 ```
 
 ## Database
 
-Single `prospects` table: id, company_name, role_title, job_url, status, interest_level, salary, notes, created_at.
+Single `prospects` table: id, company_name, role_title, job_url, status, interest_level, salary, date_applied, notes, created_at.
 
 - **Statuses**: Bookmarked, Applied, Phone Screen, Interviewing, Offer, Rejected, Withdrawn
 - **Interest levels**: High, Medium, Low

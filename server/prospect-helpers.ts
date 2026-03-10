@@ -39,9 +39,35 @@ export function validateProspect(data: Record<string, unknown>): { valid: boolea
     }
   }
 
+  if (data.dateApplied !== undefined && data.dateApplied !== null) {
+    const d = new Date(data.dateApplied as string | number | Date);
+    if (isNaN(d.getTime())) {
+      errors.push("Date applied must be a valid date");
+    }
+  }
+
   return { valid: errors.length === 0, errors };
 }
 
 export function isTerminalStatus(status: string): boolean {
   return status === "Rejected" || status === "Withdrawn" || status === "Offer";
+}
+
+export function getRelativeAge(date: Date, now: Date = new Date()): string {
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) return "In the future";
+  if (diffDays === 0) return "Added today";
+  if (diffDays === 1) return "Added 1 day ago";
+  if (diffDays < 30) return `Added ${diffDays} days ago`;
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths === 1) return "Added 1 month ago";
+  return `Added ${diffMonths} months ago`;
+}
+
+export function parseSalaryToNumber(salary: string | null | undefined): number {
+  if (!salary) return 0;
+  const digits = salary.replace(/[^0-9]/g, "");
+  return digits ? parseInt(digits, 10) : 0;
 }

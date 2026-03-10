@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Prospect } from "@shared/schema";
 import { STATUSES, INTEREST_LEVELS } from "@shared/schema";
 import { ProspectCard } from "@/components/prospect-card";
 import { AddProspectForm } from "@/components/add-prospect-form";
-import { Briefcase, Plus } from "lucide-react";
+import { Briefcase, Plus, ArrowDownWideNarrow, CalendarArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 
 type InterestFilter = typeof INTEREST_LEVELS[number] | "All";
+type AllJobsSort = "date" | "salary";
 
 const columnColors: Record<string, string> = {
   Bookmarked: "bg-blue-500",
@@ -26,9 +27,16 @@ const columnColors: Record<string, string> = {
   Offer: "bg-emerald-500",
   Rejected: "bg-red-500",
   Withdrawn: "bg-gray-500",
+  "All Jobs": "bg-slate-500",
 };
 
 const FILTER_OPTIONS: InterestFilter[] = ["All", ...INTEREST_LEVELS];
+
+function parseSalaryNum(salary: string | null | undefined): number {
+  if (!salary) return 0;
+  const digits = salary.replace(/[^0-9]/g, "");
+  return digits ? parseInt(digits, 10) : 0;
+}
 
 function KanbanColumn({
   status,
@@ -100,6 +108,85 @@ function KanbanColumn({
   );
 }
 
+function AllJobsColumn({
+  prospects,
+  isLoading,
+}: {
+  prospects: Prospect[];
+  isLoading: boolean;
+}) {
+  const [sortBy, setSortBy] = useState<AllJobsSort>("date");
+
+  const sorted = useMemo(() => {
+    const list = [...prospects];
+    if (sortBy === "salary") {
+      list.sort((a, b) => parseSalaryNum(b.salary) - parseSalaryNum(a.salary));
+    } else {
+      list.sort((a, b) => new Date(b.dateApplied).getTime() - new Date(a.dateApplied).getTime());
+    }
+    return list;
+  }, [prospects, sortBy]);
+
+  return (
+    <div
+      className="flex flex-col min-w-[260px] max-w-[320px] w-full bg-muted/40 rounded-md"
+      data-testid="column-all-jobs"
+    >
+      <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/50">
+        <div className="w-2 h-2 rounded-full bg-slate-500" />
+        <h3 className="text-sm font-semibold truncate">All Jobs</h3>
+        <Badge
+          variant="secondary"
+          className="ml-auto text-[10px] px-1.5 py-0 h-5 min-w-[20px] flex items-center justify-center no-default-active-elevate"
+          data-testid="badge-count-all-jobs"
+        >
+          {prospects.length}
+        </Badge>
+      </div>
+      <div className="flex gap-1 px-2 pt-2">
+        <Button
+          size="sm"
+          variant={sortBy === "date" ? "default" : "ghost"}
+          onClick={() => setSortBy("date")}
+          className="h-6 px-2 text-[11px] gap-1"
+          data-testid="sort-date"
+        >
+          <CalendarArrowDown className="w-3 h-3" />
+          Newest
+        </Button>
+        <Button
+          size="sm"
+          variant={sortBy === "salary" ? "default" : "ghost"}
+          onClick={() => setSortBy("salary")}
+          className="h-6 px-2 text-[11px] gap-1"
+          data-testid="sort-salary"
+        >
+          <ArrowDownWideNarrow className="w-3 h-3" />
+          Salary
+        </Button>
+      </div>
+      <div className="flex-1 overflow-y-auto px-2 py-2">
+        <div className="space-y-2">
+          {isLoading ? (
+            <>
+              <Skeleton className="h-28 rounded-md" />
+              <Skeleton className="h-20 rounded-md" />
+            </>
+          ) : sorted.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 text-center" data-testid="empty-all-jobs">
+              <p className="text-xs text-muted-foreground">No prospects</p>
+            </div>
+          ) : (
+            sorted.map((prospect) => (
+              <ProspectCard key={prospect.id} prospect={prospect} />
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -155,6 +242,10 @@ export default function Home() {
 
       <main className="flex-1 overflow-x-auto overflow-y-hidden">
         <div className="flex gap-3 p-4 h-full min-w-max">
+          <AllJobsColumn
+            prospects={prospects ?? []}
+            isLoading={isLoading}
+          />
           {STATUSES.map((status) => (
             <KanbanColumn
               key={status}
