@@ -1,8 +1,9 @@
 import { useState } from "react";
 import type { Prospect } from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Trash2, Pencil, Flame, ThumbsUp, Minus } from "lucide-react";
+import { ExternalLink, Trash2, Pencil, Flame, ThumbsUp, Minus, Clock } from "lucide-react";
 import { displaySalary } from "@/lib/currency";
+import { getRelativeAge } from "@/lib/date";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -126,6 +127,11 @@ export function ProspectCard({ prospect }: { prospect: Prospect }) {
             Posting
           </a>
         )}
+
+        <div className="flex items-center gap-1 text-xs text-muted-foreground" data-testid={`text-age-${prospect.id}`}>
+          <Clock className="w-3 h-3" />
+          {getRelativeAge(new Date(prospect.dateApplied))}
+        </div>
 
         {prospect.notes && (
           <p className="text-xs text-muted-foreground line-clamp-2" data-testid={`text-notes-${prospect.id}`}>

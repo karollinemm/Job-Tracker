@@ -39,6 +39,13 @@ export async function registerRoutes(
     if (body.roleTitle !== undefined) updates.roleTitle = body.roleTitle;
     if (body.jobUrl !== undefined) updates.jobUrl = body.jobUrl;
     if (body.salary !== undefined) updates.salary = body.salary;
+    if (body.dateApplied !== undefined) {
+      const d = new Date(body.dateApplied);
+      if (isNaN(d.getTime())) {
+        return res.status(400).json({ message: "Date applied must be a valid date" });
+      }
+      updates.dateApplied = d;
+    }
     if (body.notes !== undefined) updates.notes = body.notes;
 
     if (body.status !== undefined) {

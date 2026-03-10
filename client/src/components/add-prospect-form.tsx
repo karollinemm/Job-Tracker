@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
+import { toDateInputValue } from "@/lib/date";
 
 export function AddProspectForm({ onSuccess }: { onSuccess?: () => void }) {
   const { toast } = useToast();
@@ -38,6 +39,7 @@ export function AddProspectForm({ onSuccess }: { onSuccess?: () => void }) {
       status: "Bookmarked",
       interestLevel: "Medium",
       salary: "",
+      dateApplied: new Date(),
       notes: "",
     },
   });
@@ -159,25 +161,46 @@ export function AddProspectForm({ onSuccess }: { onSuccess?: () => void }) {
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="salary"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Salary (optional)</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="e.g. $120,000"
-                  {...field}
-                  value={field.value ?? ""}
-                  onChange={(e) => field.onChange(formatCurrency(e.target.value))}
-                  data-testid="input-salary"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="salary"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Salary (optional)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. $120,000"
+                    {...field}
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(formatCurrency(e.target.value))}
+                    data-testid="input-salary"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="dateApplied"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date Applied</FormLabel>
+                <FormControl>
+                  <Input
+                    type="date"
+                    value={field.value ? toDateInputValue(field.value) : toDateInputValue(new Date())}
+                    onChange={(e) => field.onChange(new Date(e.target.value + "T00:00:00"))}
+                    data-testid="input-date-applied"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
