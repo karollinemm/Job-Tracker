@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Prospect } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Trash2, Pencil, Flame, ThumbsUp, Minus } from "lucide-react";
+import { displaySalary } from "@/lib/currency";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -107,7 +108,7 @@ export function ProspectCard({ prospect }: { prospect: Prospect }) {
           <InterestIndicator level={prospect.interestLevel} />
           {prospect.salary && (
             <span className="inline-flex items-center text-xs font-medium text-emerald-600 dark:text-emerald-400" data-testid={`text-salary-${prospect.id}`}>
-              {prospect.salary}
+              {displaySalary(prospect.salary)}
             </span>
           )}
         </div>

@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { formatCurrency } from "@/lib/currency";
 
 interface EditProspectFormProps {
   prospect: Prospect;
@@ -173,6 +174,7 @@ export function EditProspectForm({ prospect, onSuccess }: EditProspectFormProps)
                   placeholder="e.g. $120,000"
                   {...field}
                   value={field.value ?? ""}
+                  onChange={(e) => field.onChange(formatCurrency(e.target.value))}
                   data-testid="input-edit-salary"
                 />
               </FormControl>
