@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { formatCurrency } from "@/lib/currency";
 
 export function AddProspectForm({ onSuccess }: { onSuccess?: () => void }) {
   const { toast } = useToast();
@@ -36,6 +37,7 @@ export function AddProspectForm({ onSuccess }: { onSuccess?: () => void }) {
       jobUrl: "",
       status: "Bookmarked",
       interestLevel: "Medium",
+      salary: "",
       notes: "",
     },
   });
@@ -156,6 +158,26 @@ export function AddProspectForm({ onSuccess }: { onSuccess?: () => void }) {
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="salary"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Salary (optional)</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g. $120,000"
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(e) => field.onChange(formatCurrency(e.target.value))}
+                  data-testid="input-salary"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
